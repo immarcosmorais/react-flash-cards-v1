@@ -10,18 +10,35 @@ import RadioButton from "../components/RadioButton";
 
 export default function FlachCardsPage() {
   const [allCards, setAllCards] = useState(allFlashCards);
-  const [showTitle, setShowTitle] = useState(false);
+  const [radioButtonShowTitle, setRadioButtonShowTitle] = useState(true);
   function handleButtonClick() {
     const shuffledCards = helperShuffleArray(allCards);
     setAllCards(shuffledCards);
   }
 
   function handleRadioButtonShowTitle() {
-    setShowTitle(true);
+    const updatedCards = [...allCards].map((card) => ({
+      ...card,
+      showTitle: false,
+    }));
+    setAllCards(updatedCards);
+    setRadioButtonShowTitle(true);
   }
 
   function handleRadioButtonShowDescription() {
-    setShowTitle(false);
+    const updatedCards = [...allCards].map((card) => ({
+      ...card,
+      showTitle: true,
+    }));
+    setAllCards(updatedCards);
+    setRadioButtonShowTitle(true);
+  }
+
+  function handleToggleFlashCard(cardId) {
+    const updatedCards = [...allCards];
+    const cardIndex = updatedCards.findIndex((card) => card.id === cardId);
+    updatedCards[cardIndex].showTitle = !updatedCards[cardIndex].showTitle;
+    setAllCards(updatedCards);
   }
 
   return (
@@ -36,7 +53,7 @@ export default function FlachCardsPage() {
           <RadioButton
             id="idRadioButttonShowTittle"
             name="showInfo"
-            buttonChecked={showTitle}
+            buttonChecked={radioButtonShowTitle}
             onButtonCLick={handleRadioButtonShowTitle}
           >
             Mostrar título
@@ -44,20 +61,22 @@ export default function FlachCardsPage() {
           <RadioButton
             id="idRadioButttonShowDescription"
             name="showInfo"
-            buttonChecked={!showTitle}
+            buttonChecked={!radioButtonShowTitle}
             onButtonCLick={handleRadioButtonShowDescription}
           >
             Mostrar Descrição
           </RadioButton>
         </div>
         <FlashCards>
-          {allCards.map(({ id, title, description }) => {
+          {allCards.map(({ id, title, description, showTitle }) => {
             return (
               <FlashCard
                 key={id}
+                id={id}
                 title={title}
                 description={description}
                 showFlashCardTitle={showTitle}
+                onToggleFlashCard={handleToggleFlashCard}
               />
             );
           })}
