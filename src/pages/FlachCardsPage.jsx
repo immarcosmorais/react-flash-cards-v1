@@ -10,42 +10,51 @@ import { apiGetAllFlashCards } from "../services/apiService";
 
 export default function FlachCardsPage() {
   const [allCards, setAllCards] = useState([]);
+  const [studyCards, setStudyCards] = useState([]);
   const [radioButtonShowTitle, setRadioButtonShowTitle] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiGetAllFlashCards().then((allFlashCards) => {
-      setAllCards(allFlashCards);
-    });
+    async function getAllCards() {
+      const backEndAllCards = await apiGetAllFlashCards();
+      setAllCards(backEndAllCards);
+    }
+    getAllCards();
+    setLoading(false);
   }, []);
 
   function handleButtonClick() {
-    const shuffledCards = helperShuffleArray(allCards);
-    setAllCards(shuffledCards);
+    const shuffledCards = helperShuffleArray(studyCards);
+    setStudyCards(shuffledCards);
   }
 
+  useEffect(() => {
+    setStudyCards(allCards.map((card) => ({ ...card, showTitle: true })));
+  }, [allCards]);
+
   function handleRadioButtonShowTitle() {
-    const updatedCards = [...allCards].map((card) => ({
+    const updatedCards = [...studyCards].map((card) => ({
       ...card,
       showTitle: false,
     }));
-    setAllCards(updatedCards);
-    setRadioButtonShowTitle(true);
+    setStudyCards(updatedCards);
+    setRadioButtonShowTitle(false);
   }
 
   function handleRadioButtonShowDescription() {
-    const updatedCards = [...allCards].map((card) => ({
+    const updatedCards = [...studyCards].map((card) => ({
       ...card,
       showTitle: true,
     }));
-    setAllCards(updatedCards);
+    setStudyCards(updatedCards);
     setRadioButtonShowTitle(true);
   }
 
   function handleToggleFlashCard(cardId) {
-    const updatedCards = [...allCards];
+    const updatedCards = [...studyCards];
     const cardIndex = updatedCards.findIndex((card) => card.id === cardId);
     updatedCards[cardIndex].showTitle = !updatedCards[cardIndex].showTitle;
-    setAllCards(updatedCards);
+    setStudyCards(updatedCards);
   }
 
   return (
@@ -75,7 +84,7 @@ export default function FlachCardsPage() {
           </RadioButton>
         </div>
         <FlashCards>
-          {allCards.map(({ id, title, description, showTitle }) => {
+          {studyCards.map(({ id, title, description, showTitle }) => {
             return (
               <FlashCard
                 key={id}
