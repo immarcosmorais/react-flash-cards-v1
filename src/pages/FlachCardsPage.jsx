@@ -7,20 +7,29 @@ import Main from "../components/Main";
 import { helperShuffleArray } from "../helpers/arrayHelpers";
 import RadioButton from "../components/RadioButton";
 import { apiGetAllFlashCards } from "../services/apiService";
+import Loading from "../components/Loading";
+import Error from "../components/Error";
 
 export default function FlachCardsPage() {
   const [allCards, setAllCards] = useState([]);
   const [studyCards, setStudyCards] = useState([]);
   const [radioButtonShowTitle, setRadioButtonShowTitle] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function getAllCards() {
-      const backEndAllCards = await apiGetAllFlashCards();
-      setAllCards(backEndAllCards);
+      try {
+        const backEndAllCards = await apiGetAllFlashCards();
+        setAllCards(backEndAllCards);
+        setTimeout(() => {
+          setLoading(false);
+        }, 500);
+      } catch (err) {
+        setError(err.message);
+      }
     }
     getAllCards();
-    setLoading(false);
   }, []);
 
   function handleButtonClick() {
@@ -57,10 +66,19 @@ export default function FlachCardsPage() {
     setStudyCards(updatedCards);
   }
 
-  return (
-    <>
-      <Header>react-flash-cards-v1</Header>
-      <Main>
+  let mainJsx = (
+    <div className="flex justify-center  my-4 items-center">
+      <Loading />
+    </div>
+  );
+
+  if (error) {
+    mainJsx = <Error>{error}</Error>;
+  }
+
+  if (!loading) {
+    mainJsx = (
+      <>
         <div className="text-center mb-4">
           <Button onButtonCLick={handleButtonClick}>Embaralhar cards</Button>
         </div>
@@ -97,7 +115,15 @@ export default function FlachCardsPage() {
             );
           })}
         </FlashCards>
-      </Main>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Header>react-flash-cards-v1</Header>
+
+      <Main>{mainJsx}</Main>
     </>
   );
 }
