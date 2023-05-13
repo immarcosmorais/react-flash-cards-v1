@@ -10,6 +10,9 @@ import { apiGetAllFlashCards } from "../services/apiService";
 import Loading from "../components/Loading";
 import Error from "../components/Error";
 
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
+
 export default function FlachCardsPage() {
   const [allCards, setAllCards] = useState([]);
   const [studyCards, setStudyCards] = useState([]);
@@ -122,7 +125,6 @@ export default function FlachCardsPage() {
   return (
     <>
       <Header>react-flash-cards-v1</Header>
-
       <Main>{mainJsx}</Main>
     </>
   );
